@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* Enable Tailwind dark mode using the .dark class */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --muted: #475569;
+  --line: rgba(148, 163, 184, 0.2);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 28%),
+    linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
+  color: var(--text);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+html.dark body {
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 28%),
+    linear-gradient(180deg, #020617 0%, #0f172a 100%);
+  color: #e2e8f0;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+section {
+  position: relative;
+}
+
+section:nth-of-type(even) {
+  background: rgba(255, 255, 255, 0.72);
+}
+
+html.dark section:nth-of-type(even) {
+  background: rgba(15, 23, 42, 0.7);
+}
