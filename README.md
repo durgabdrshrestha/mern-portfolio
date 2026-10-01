@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Personal MERN Portfolio
 
 A full-stack portfolio website built with MongoDB, Express, React, and Node.js. This project separates the public portfolio website from the admin content management system so you can manage your personal profile, skills, projects, services, education, testimonials, messages, social links, and resume from one dashboard.
@@ -244,3 +245,7 @@ If you want, this project can be extended with:
 - richer admin tables and filters
 - multi-admin roles
 - CMS editor support
+=======
+# mern-portfolio
+Excited to share my personal portfolio website built with the MERN Stack! Features a responsive UI, smooth navigation, dynamic project showcases, and a backend REST API powered by Node.js and MongoDB.
+>>>>>>> 0872f6e94defcd8cbc1fc50ac9ad40a1dd865ea0
