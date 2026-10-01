@@ -11,6 +11,7 @@ import {
 } from "../controllers/contactController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
+import { contactLimiter } from "../middleware/rateLimiters.js";
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ const router = express.Router();
 // =====================================================
 
 // Visitor sends contact message
-router.post("/", createContactMessage);
+router.post("/", contactLimiter, createContactMessage);
 
 // =====================================================
 // ADMIN ROUTES

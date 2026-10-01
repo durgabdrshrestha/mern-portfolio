@@ -69,9 +69,8 @@ const Privacy = () => {
           <div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Cookies and analytics</h2>
             <p className="mt-3 leading-8 text-slate-600 dark:text-slate-400">
-              This portfolio may use standard web technologies such as cookies or analytics tools to
-              understand usage trends and improve the user experience. Users may disable cookies in
-              their browser settings where supported.
+              This portfolio records aggregate page-view totals by day to understand overall site
+              usage. Analytics does not store visitor names, IP addresses, or persistent visitor IDs.
             </p>
           </div>
 

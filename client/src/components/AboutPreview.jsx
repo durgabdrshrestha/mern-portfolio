@@ -15,7 +15,7 @@ const AboutPreview = ({ profile }) => {
     return null;
   }
 
-  const profileImage = profile.profileImage || profile.image || "";
+  const profileImage = profile.aboutImage || profile.profileImage || profile.image || "";
 
   return (
     <section id="about" className="bg-slate-50 py-20 dark:bg-slate-900/40">

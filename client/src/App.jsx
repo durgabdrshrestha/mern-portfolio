@@ -1,83 +1,159 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 
 import PublicLayout from "./layouts/PublicLayout";
 import { AuthProvider } from "./context/AuthContext";
 
-import Home from "./pages/Home";
-import About from "./pages/About";
-import Skills from "./pages/Skills";
-import Services from "./pages/Services";
-import Experience from "./pages/Experience";
-import Education from "./pages/Education";
-import Projects from "./pages/Projects";
-import ProjectDetails from "./pages/ProjectDetails";
-import Testimonials from "./pages/Testimonials";
-import Contact from "./pages/Contact";
-import Privacy from "./pages/Privacy";
+const Home = lazy(() => import("./pages/Home"));
+const About = lazy(() => import("./pages/About"));
+const Skills = lazy(() => import("./pages/Skills"));
+const Services = lazy(() => import("./pages/Services"));
+const Experience = lazy(() => import("./pages/Experience"));
+const Education = lazy(() => import("./pages/Education"));
+const Projects = lazy(() => import("./pages/Projects"));
+const ProjectDetails = lazy(() => import("./pages/ProjectDetails"));
+const Testimonials = lazy(() => import("./pages/Testimonials"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 import ScrollToTop from "./components/ScrollToTop";
 
-import AdminLayout from "./admin/AdminLayout";
-import AdminDashboard from "./admin/pages/AdminDashboard";
-import AdminLogin from "./admin/pages/AdminLogin";
+const AdminLayout = lazy(() => import("./admin/AdminLayout"));
+const AdminDashboard = lazy(() => import("./admin/pages/AdminDashboard"));
+const AdminLogin = lazy(() => import("./admin/pages/AdminLogin"));
 import ProtectedRoute from "./components/ProtectedRoute";
-import AdminProjects from "./admin/pages/AdminProjects";
-import AdminProfile from "./admin/pages/AdminProfile";
-import AdminSkills from "./admin/pages/AdminSkills";
-import AdminServices from "./admin/pages/AdminServices";
-import AdminExperience from "./admin/pages/AdminExperience";
-import AdminEducation from "./admin/pages/AdminEducation";
-import AdminTestimonials from "./admin/pages/AdminTestimonials";
-import AdminMessages from "./admin/pages/AdminMessages";
-import AdminSocialLinks from "./admin/pages/AdminSocialLinks";
-import AdminResume from "./admin/pages/AdminResume";
-import AdminUsers from "./admin/pages/AdminUsers";
-import AdminPrivacy from "./admin/pages/AdminPrivacy";
+const AdminProjects = lazy(() => import("./admin/pages/AdminProjects"));
+const AdminProfile = lazy(() => import("./admin/pages/AdminProfile"));
+const AdminSkills = lazy(() => import("./admin/pages/AdminSkills"));
+const AdminServices = lazy(() => import("./admin/pages/AdminServices"));
+const AdminExperience = lazy(() => import("./admin/pages/AdminExperience"));
+const AdminEducation = lazy(() => import("./admin/pages/AdminEducation"));
+const AdminTestimonials = lazy(() => import("./admin/pages/AdminTestimonials"));
+const AdminMessages = lazy(() => import("./admin/pages/AdminMessages"));
+const AdminSocialLinks = lazy(() => import("./admin/pages/AdminSocialLinks"));
+const AdminResume = lazy(() => import("./admin/pages/AdminResume"));
+const AdminUsers = lazy(() => import("./admin/pages/AdminUsers"));
+const AdminPrivacy = lazy(() => import("./admin/pages/AdminPrivacy"));
+import { recordPageView } from "./services/analyticsService";
 
-const routeTitles = {
-  "/": "Durga Bahadur Shrestha | Portfolio",
-  "/about": "Durga Bahadur Shrestha | About",
-  "/skills": "Durga Bahadur Shrestha | Skills",
-  "/services": "Durga Bahadur Shrestha | Services",
-  "/experience": "Durga Bahadur Shrestha | Experience",
-  "/education": "Durga Bahadur Shrestha | Education",
-  "/projects": "Durga Bahadur Shrestha | Projects",
-  "/testimonials": "Durga Bahadur Shrestha | Testimonials",
-  "/contact": "Durga Bahadur Shrestha | Contact",
-  "/privacy": "Durga Bahadur Shrestha | Privacy Policy",
-  "/admin/login": "Admin Login | Durga Bahadur Shrestha",
-  "/admin": "Admin Dashboard | Durga Bahadur Shrestha",
-  "/admin/profile": "Profile Management | Durga Bahadur Shrestha",
-  "/admin/skills": "Skills Management | Durga Bahadur Shrestha",
-  "/admin/services": "Services Management | Durga Bahadur Shrestha",
-  "/admin/experience": "Experience Management | Durga Bahadur Shrestha",
-  "/admin/education": "Education Management | Durga Bahadur Shrestha",
-  "/admin/projects": "Projects Management | Durga Bahadur Shrestha",
-  "/admin/testimonials": "Testimonials Management | Durga Bahadur Shrestha",
-  "/admin/messages": "Messages | Durga Bahadur Shrestha",
-  "/admin/social-links": "Social Links Management | Durga Bahadur Shrestha",
-  "/admin/privacy": "Privacy Policy Management | Durga Bahadur Shrestha",
-  "/admin/resume": "Resume Management | Durga Bahadur Shrestha",
-  "/admin/users": "User Management | Durga Bahadur Shrestha",
+const routeMetadata = {
+  "/": {
+    title: "Durga Bahadur Shrestha | MERN Stack Developer",
+    description: "Official portfolio of Durga Bahadur Shrestha, a MERN stack developer and IT support professional in Nepal. Explore projects, skills, experience, and contact details.",
+  },
+  "/about": {
+    title: "About Durga Bahadur Shrestha | Developer Portfolio",
+    description: "Learn about Durga Bahadur Shrestha, his background, experience, and work as a MERN stack developer and IT support professional.",
+  },
+  "/skills": {
+    title: "Technical Skills | Durga Bahadur Shrestha",
+    description: "Explore the web development, MERN stack, and IT support skills of Durga Bahadur Shrestha.",
+  },
+  "/services": {
+    title: "Development Services | Durga Bahadur Shrestha",
+    description: "MERN stack development and practical web services from Durga Bahadur Shrestha.",
+  },
+  "/experience": {
+    title: "Professional Experience | Durga Bahadur Shrestha",
+    description: "Review the development and IT support experience of Durga Bahadur Shrestha.",
+  },
+  "/education": {
+    title: "Education | Durga Bahadur Shrestha",
+    description: "Education and academic background of MERN stack developer Durga Bahadur Shrestha.",
+  },
+  "/projects": {
+    title: "Web Development Projects | Durga Bahadur Shrestha",
+    description: "Browse web applications and software projects built by MERN stack developer Durga Bahadur Shrestha.",
+  },
+  "/testimonials": {
+    title: "Client Testimonials | Durga Bahadur Shrestha",
+    description: "Testimonials and recommendations for the work of Durga Bahadur Shrestha.",
+  },
+  "/contact": {
+    title: "Contact Durga Bahadur Shrestha | Work Inquiries",
+    description: "Contact Durga Bahadur Shrestha about MERN stack development, IT support, and professional opportunities.",
+  },
+  "/privacy": {
+    title: "Privacy Policy | Durga Bahadur Shrestha",
+    description: "Privacy information for visitors and people contacting Durga Bahadur Shrestha through this portfolio.",
+  },
+  "/admin/login": {
+    title: "Admin Login | Durga Bahadur Shrestha",
+    description: "Portfolio administration sign-in.",
+  },
 };
 
 const RouteMeta = () => {
   const location = useLocation();
+  const lastTrackedPath = useRef("");
 
   useEffect(() => {
-    const title = routeTitles[location.pathname] || "Durga Bahadur Shrestha | Portfolio";
-    document.title = title;
+    const metadata = routeMetadata[location.pathname] || (location.pathname.startsWith("/admin")
+      ? {
+          title: "Portfolio Admin | Durga Bahadur Shrestha",
+          description: "Portfolio administration.",
+        }
+      : location.pathname.startsWith("/projects/")
+        ? {
+            title: "Project Details | Durga Bahadur Shrestha",
+            description: "Project details, technologies, and outcomes from the portfolio of Durga Bahadur Shrestha.",
+          }
+        : {
+            title: "Durga Bahadur Shrestha | MERN Stack Developer",
+            description: "Explore the portfolio, projects, and professional experience of Durga Bahadur Shrestha.",
+          });
+    const canonicalOrigin = (import.meta.env.VITE_SITE_URL || window.location.origin).replace(/\/+$/, "");
+    const canonicalUrl = `${canonicalOrigin}${location.pathname}`;
+    const isAdminRoute = location.pathname.startsWith("/admin");
 
-    const description = "Durga Bahadur Shrestha portfolio, services, projects, and contact information.";
-    let metaTag = document.querySelector("meta[name='description']");
+    document.title = metadata.title;
 
-    if (!metaTag) {
-      metaTag = document.createElement("meta");
-      metaTag.setAttribute("name", "description");
-      document.head.appendChild(metaTag);
+    const setMeta = (selector, attribute, key, value) => {
+      let element = document.head.querySelector(selector);
+      if (!element) {
+        element = document.createElement("meta");
+        element.setAttribute(attribute, key);
+        document.head.appendChild(element);
+      }
+      element.setAttribute("content", value);
+    };
+
+    setMeta("meta[name='description']", "name", "description", metadata.description);
+    setMeta("meta[name='robots']", "name", "robots", isAdminRoute ? "noindex, nofollow" : "index, follow");
+    setMeta("meta[property='og:type']", "property", "og:type", "website");
+    setMeta("meta[property='og:title']", "property", "og:title", metadata.title);
+    setMeta("meta[property='og:description']", "property", "og:description", metadata.description);
+    setMeta("meta[property='og:url']", "property", "og:url", canonicalUrl);
+    setMeta("meta[name='twitter:card']", "name", "twitter:card", "summary");
+    setMeta("meta[name='twitter:title']", "name", "twitter:title", metadata.title);
+    setMeta("meta[name='twitter:description']", "name", "twitter:description", metadata.description);
+
+    let canonical = document.head.querySelector("link[rel='canonical']");
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
     }
+    canonical.href = canonicalUrl;
 
-    metaTag.setAttribute("content", description);
+    let personSchema = document.getElementById("person-schema");
+    if (!personSchema) {
+      personSchema = document.createElement("script");
+      personSchema.id = "person-schema";
+      personSchema.type = "application/ld+json";
+      document.head.appendChild(personSchema);
+    }
+    personSchema.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: "Durga Bahadur Shrestha",
+      jobTitle: "MERN Stack Developer and IT Support Professional",
+      url: canonicalOrigin,
+    });
+
+    if (!isAdminRoute && lastTrackedPath.current !== location.pathname) {
+      lastTrackedPath.current = location.pathname;
+      recordPageView().catch(() => {});
+    }
   }, [location.pathname]);
 
   return null;
@@ -89,7 +165,8 @@ const App = () => {
       <BrowserRouter>
         <RouteMeta />
         <ScrollToTop />
-        <Routes>
+        <Suspense fallback={<div role="status" className="flex min-h-64 items-center justify-center text-sm text-slate-600 dark:text-slate-300">Loading page...</div>}>
+          <Routes>
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
@@ -124,7 +201,8 @@ const App = () => {
               <Route path="users" element={<AdminUsers />} />
             </Route>
           </Route>
-        </Routes>
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </AuthProvider>
   );

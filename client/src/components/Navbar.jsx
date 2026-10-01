@@ -117,7 +117,7 @@ const Navbar = () => {
               </p>
 
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                MERN Developer
+                MERN Stack Developer
               </p>
             </div>
           </NavLink>

@@ -1,4 +1,5 @@
 import Service from "../models/Service.js";
+import { uploadedFileUrl } from "../middleware/uploadMiddleware.js";
 
 // Get active services for public portfolio
 export const getServices = async (req, res) => {
@@ -88,7 +89,7 @@ export const createService = async (req, res) => {
       shortDescription,
       description,
       icon,
-      image: req.file ? `/uploads/services/${req.file.filename}` : image,
+      image: req.file ? uploadedFileUrl(req.file, "services") : image,
       features,
       order,
       isActive,
@@ -119,7 +120,7 @@ export const updateService = async (req, res) => {
       id,
       {
         ...req.body,
-        ...(req.file && { image: `/uploads/services/${req.file.filename}` }),
+        ...(req.file && { image: uploadedFileUrl(req.file, "services") }),
       },
       {
         new: true,

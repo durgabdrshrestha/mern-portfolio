@@ -1,4 +1,5 @@
 import Resume from "../models/Resume.js";
+import { uploadedFileUrl } from "../middleware/uploadMiddleware.js";
 
 // =====================================================
 // GET ACTIVE RESUME
@@ -85,10 +86,14 @@ export const createResume = async (req, res) => {
       });
     }
 
+    const resumeUrl = req.file
+      ? uploadedFileUrl(req.file, "resumes")
+      : url.trim();
+
     // 2. Check for duplicate resume
     const existingResume = await Resume.findOne({
       title: title.trim(),
-      url: req.file ? `/uploads/resumes/${req.file.filename}` : url.trim(),
+      url: resumeUrl,
     });
 
     if (existingResume) {
@@ -110,7 +115,7 @@ export const createResume = async (req, res) => {
     // 4. Create new resume
     const resume = await Resume.create({
       title: title.trim(),
-      url: url.trim(),
+      url: resumeUrl,
       version,
       downloadEnabled,
       isActive,
@@ -156,7 +161,7 @@ export const updateResume = async (req, res) => {
       id,
       {
         ...req.body,
-        ...(req.file && { url: `/uploads/resumes/${req.file.filename}` }),
+        ...(req.file && { url: uploadedFileUrl(req.file, "resumes") }),
       },
       {
         new: true,

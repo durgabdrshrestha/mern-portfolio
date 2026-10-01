@@ -5,7 +5,7 @@ import {
   createProfile,
   updateProfile,
 } from "../../services/profileService";
-import { SERVER_BASE_URL } from "../../services/api";
+import { resolveAssetUrl } from "../../services/api";
 
 const emptyForm = {
   name: "",
@@ -13,6 +13,8 @@ const emptyForm = {
   shortBio: "",
   about: "",
   profileImage: "",
+  homeImage: "",
+  aboutImage: "",
   email: "",
   phone: "",
   location: "",
@@ -26,7 +28,7 @@ const AdminProfile = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [hasProfile, setHasProfile] = useState(false);
-  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [imageFiles, setImageFiles] = useState({ homeImage: null, aboutImage: null });
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -65,6 +67,11 @@ const AdminProfile = () => {
     }));
   };
 
+  const handleImageChange = (event) => {
+    const { name, files } = event.target;
+    setImageFiles((previous) => ({ ...previous, [name]: files?.[0] || null }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -73,14 +80,16 @@ const AdminProfile = () => {
 
     try {
       if (hasProfile) {
-        const response = await updateProfile(form, profileImageFile);
+        const response = await updateProfile(form, imageFiles);
+        if (response.profile) setForm((current) => ({ ...current, ...response.profile }));
         setSuccess(response.message || "Profile updated successfully.");
       } else {
-        const response = await createProfile(form, profileImageFile);
+        const response = await createProfile(form, imageFiles);
+        if (response.profile) setForm((current) => ({ ...current, ...response.profile }));
         setHasProfile(true);
         setSuccess(response.message || "Profile created successfully.");
       }
-      setProfileImageFile(null);
+      setImageFiles({ homeImage: null, aboutImage: null });
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save profile.");
     } finally {
@@ -130,9 +139,17 @@ const AdminProfile = () => {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium" htmlFor="profileImageFile">Profile photo</label>
-            <input id="profileImageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => setProfileImageFile(event.target.files?.[0] || null)} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900" />
-            {form.profileImage && <img src={form.profileImage.startsWith("http") ? form.profileImage : `${SERVER_BASE_URL}${form.profileImage}`} alt="Current profile" className="mt-3 h-20 w-20 rounded-full object-cover" />}
+            <label className="mb-2 block text-sm font-medium" htmlFor="homeImage">Home section image</label>
+            <input id="homeImage" name="homeImage" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900" />
+            {imageFiles.homeImage && <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Selected: {imageFiles.homeImage.name}</p>}
+            {(form.homeImage || form.profileImage) && <img src={resolveAssetUrl(form.homeImage || form.profileImage)} alt="Current home section" className="mt-3 h-24 w-24 rounded-xl object-cover" />}
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium" htmlFor="aboutImage">About section image</label>
+            <input id="aboutImage" name="aboutImage" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900" />
+            {imageFiles.aboutImage && <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Selected: {imageFiles.aboutImage.name}</p>}
+            {(form.aboutImage || form.profileImage) && <img src={resolveAssetUrl(form.aboutImage || form.profileImage)} alt="Current about section" className="mt-3 h-24 w-24 rounded-xl object-cover" />}
           </div>
 
           <div>

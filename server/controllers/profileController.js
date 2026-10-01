@@ -1,4 +1,5 @@
 import Profile from "../models/Profile.js";
+import { uploadedFileUrl } from "../middleware/uploadMiddleware.js";
 
 // Get portfolio profile
 export const getProfile = async (req, res) => {
@@ -39,9 +40,18 @@ export const createProfile = async (req, res) => {
       });
     }
 
+    const uploadedFiles = req.files || {};
     const profile = await Profile.create({
       ...req.body,
-      profileImage: req.file ? `/uploads/profile/${req.file.filename}` : req.body.profileImage,
+      profileImage: uploadedFiles.profileImage?.[0]
+        ? uploadedFileUrl(uploadedFiles.profileImage[0], "profile")
+        : req.body.profileImage,
+      homeImage: uploadedFiles.homeImage?.[0]
+        ? uploadedFileUrl(uploadedFiles.homeImage[0], "profile")
+        : req.body.homeImage,
+      aboutImage: uploadedFiles.aboutImage?.[0]
+        ? uploadedFileUrl(uploadedFiles.aboutImage[0], "profile")
+        : req.body.aboutImage,
       availableForWork: req.body.availableForWork === "true" || req.body.availableForWork === true,
     });
 
@@ -73,9 +83,18 @@ export const updateProfile = async (req, res) => {
       });
     }
 
+    const uploadedFiles = req.files || {};
     const updateData = {
       ...req.body,
-      ...(req.file && { profileImage: `/uploads/profile/${req.file.filename}` }),
+      ...(uploadedFiles.profileImage?.[0] && {
+        profileImage: uploadedFileUrl(uploadedFiles.profileImage[0], "profile"),
+      }),
+      ...(uploadedFiles.homeImage?.[0] && {
+        homeImage: uploadedFileUrl(uploadedFiles.homeImage[0], "profile"),
+      }),
+      ...(uploadedFiles.aboutImage?.[0] && {
+        aboutImage: uploadedFileUrl(uploadedFiles.aboutImage[0], "profile"),
+      }),
       ...(req.body.availableForWork !== undefined && {
         availableForWork: req.body.availableForWork === "true" || req.body.availableForWork === true,
       }),

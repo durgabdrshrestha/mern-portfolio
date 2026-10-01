@@ -27,7 +27,7 @@ const Footer = () => {
         if (response?.resume?.isActive !== false) {
           setResume(response.resume);
         }
-      } catch (error) {
+      } catch {
         // Resume is optional, so don't break the footer
         console.log("No active resume available.");
       }

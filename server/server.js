@@ -19,6 +19,7 @@ import contactRoutes from "./routes/contactRoutes.js";
 import socialLinkRoutes from "./routes/socialLinkRoutes.js";
 import resumeRoutes from "./routes/resumeRoutes.js";
 import privacyRoutes from "./routes/privacyRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 
 dotenv.config({ path: path.join(path.dirname(fileURLToPath(import.meta.url)), ".env") });
 
@@ -26,11 +27,16 @@ connectDB();
 
 const app = express();
 const port = process.env.PORT || 5000;
+const trustProxyHops = Number.parseInt(process.env.TRUST_PROXY_HOPS || "0", 10);
 const allowedOrigins = [
   process.env.CLIENT_URL,
   "http://localhost:5173",
   "http://127.0.0.1:5173",
 ].filter(Boolean);
+
+if (Number.isInteger(trustProxyHops) && trustProxyHops > 0) {
+  app.set("trust proxy", trustProxyHops);
+}
 
 app.use(
   helmet({
@@ -71,6 +77,7 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/social-links", socialLinkRoutes);
 app.use("/api/resume", resumeRoutes);
 app.use("/api/privacy", privacyRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 app.get("/", (req, res) => {
   res.json({

@@ -37,6 +37,18 @@ const profileSchema = new mongoose.Schema(
       trim: true,
     },
 
+    homeImage: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    aboutImage: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
     // Resume URL
     resumeUrl: {
       type: String,

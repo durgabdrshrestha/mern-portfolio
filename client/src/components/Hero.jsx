@@ -97,9 +97,9 @@ const Hero = ({ profile, resume }) => {
                 md:w-80
               "
             >
-              {profile?.profileImage ? (
+              {profile?.homeImage || profile?.profileImage ? (
                 <img
-                  src={resolveAssetUrl(profile.profileImage)}
+                  src={resolveAssetUrl(profile.homeImage || profile.profileImage)}
                   alt={profile.name || "Profile"}
                   className="h-full w-full object-cover"
                 />

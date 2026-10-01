@@ -1,4 +1,5 @@
 import Testimonial from "../models/Testimonial.js";
+import { uploadedFileUrl } from "../middleware/uploadMiddleware.js";
 
 // =====================================================
 // GET ACTIVE TESTIMONIALS
@@ -146,7 +147,7 @@ export const createTestimonial = async (req, res) => {
             name,
             role,
             company,
-            image: req.file ? `/uploads/testimonials/${req.file.filename}` : image,
+            image: req.file ? uploadedFileUrl(req.file, "testimonials") : image,
             message,
             rating,
             relationship,
@@ -186,7 +187,7 @@ export const updateTestimonial = async (req, res) => {
                 id,
                 {
                     ...req.body,
-                    ...(req.file && { image: `/uploads/testimonials/${req.file.filename}` }),
+                    ...(req.file && { image: uploadedFileUrl(req.file, "testimonials") }),
                 },
                 {
                     new: true,

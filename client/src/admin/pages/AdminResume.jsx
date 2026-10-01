@@ -6,7 +6,7 @@ import {
   updateResume,
   deleteResume,
 } from "../../services/resumeService";
-import { SERVER_BASE_URL } from "../../services/api";
+import { resolveAssetUrl } from "../../services/api";
 
 const emptyForm = {
   title: "",
@@ -118,7 +118,7 @@ const AdminResume = () => {
           <div>
             <label className="mb-2 block text-sm font-medium" htmlFor="resumeFile">Resume PDF</label>
             <input id="resumeFile" type="file" accept="application/pdf,.pdf" onChange={(event) => setResumeFile(event.target.files?.[0] || null)} className="w-full rounded-xl border border-slate-300 px-3 py-2 dark:border-slate-700 dark:bg-slate-900" required={!editingId && !form.url} />
-            {form.url && <a href={form.url.startsWith("http") ? form.url : `${SERVER_BASE_URL}${form.url}`} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm font-medium text-emerald-700 underline dark:text-emerald-400">Open current resume</a>}
+            {form.url && <a href={resolveAssetUrl(form.url)} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm font-medium text-emerald-700 underline dark:text-emerald-400">Open current resume</a>}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -163,7 +163,7 @@ const AdminResume = () => {
                     <div>
                       <p className="font-semibold">{item.title}</p>
                       <p className="text-sm text-slate-500">{item.version}</p>
-                      <a href={item.url.startsWith("http") ? item.url : `${SERVER_BASE_URL}${item.url}`} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-emerald-700 underline dark:text-emerald-400">View file</a>
+                      <a href={resolveAssetUrl(item.url)} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-emerald-700 underline dark:text-emerald-400">View file</a>
                     </div>
                     <div className="flex gap-2">
                       <button type="button" onClick={() => handleEdit(item)} className="rounded-lg border border-slate-300 px-2 py-1 text-xs">Edit</button>

@@ -1,9 +1,20 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import { FiArrowUpRight, FiFileText, FiFolder, FiMessageSquare, FiSettings, FiUser, FiUsers } from "react-icons/fi";
+import { getAnalyticsSummary } from "../../services/analyticsService";
 
 const AdminDashboard = () => {
   const { admin } = useAuth();
+  const [analytics, setAnalytics] = useState(null);
+  const [analyticsUnavailable, setAnalyticsUnavailable] = useState(false);
+
+  useEffect(() => {
+    getAnalyticsSummary()
+      .then((response) => setAnalytics(response.summary))
+      .catch(() => setAnalyticsUnavailable(true));
+  }, []);
+
   const shortcuts = [
     { title: "Profile", description: "Identity and contact details", to: "/admin/profile", icon: FiUser },
     { title: "Projects", description: "Portfolio projects and galleries", to: "/admin/projects", icon: FiFolder },
@@ -20,6 +31,30 @@ const AdminDashboard = () => {
         <h2 className="mt-2 text-2xl font-bold text-slate-950 dark:text-white">Welcome back, {admin?.name || "Admin"}</h2>
         <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Choose a section to continue managing your portfolio.</p>
       </header>
+
+      <section aria-labelledby="analytics-heading">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h3 id="analytics-heading" className="text-sm font-semibold text-slate-700 dark:text-slate-200">Audience overview</h3>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Aggregate page views by UTC day; no visitor identities or IP addresses are stored.</p>
+          </div>
+          {analyticsUnavailable && <p role="status" className="text-xs text-amber-700 dark:text-amber-400">Page-view data is temporarily unavailable.</p>}
+        </div>
+        <dl className="grid gap-3 sm:grid-cols-3">
+          {[
+            { label: "Page views today", value: analytics?.pageViewsToday },
+            { label: "Page views · 30 days", value: analytics?.pageViewsLast30Days },
+            { label: "Daily average · 30 days", value: analytics?.dailyAverage },
+          ].map(({ label, value }) => (
+            <div key={label} className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-950">
+              <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</dt>
+              <dd className="mt-2 text-2xl font-bold tabular-nums text-slate-950 dark:text-white">
+                {value === undefined ? (analyticsUnavailable ? "--" : "…") : value.toLocaleString()}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
 
       <div>
         <h3 className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-200">Quick access</h3>

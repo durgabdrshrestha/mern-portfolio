@@ -5,7 +5,18 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || fallbackApiUrl;
 export const SERVER_BASE_URL = API_BASE_URL.replace("/api", "");
 export const resolveAssetUrl = (assetPath) => {
   if (!assetPath) return "";
-  if (/^(?:https?:)?\/\//i.test(assetPath) || assetPath.startsWith("data:")) return assetPath;
+  if (assetPath.startsWith("data:")) return assetPath;
+  if (/^(?:https?:)?\/\//i.test(assetPath)) {
+    try {
+      const parsedUrl = new URL(assetPath, window.location.origin);
+      if (["localhost", "127.0.0.1", "::1"].includes(parsedUrl.hostname)) {
+        return `${SERVER_BASE_URL.replace(/\/$/, "")}${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
+      }
+    } catch {
+      return assetPath;
+    }
+    return assetPath;
+  }
   return `${SERVER_BASE_URL.replace(/\/$/, "")}/${assetPath.replace(/^\/+/, "")}`;
 };
 

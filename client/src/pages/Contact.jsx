@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   FaEnvelope,
@@ -9,8 +9,24 @@ import {
 } from "react-icons/fa";
 
 import { sendContactMessage } from "../services/contactService";
+import { getProfile } from "../services/profileService";
 
 const Contact = () => {
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    getProfile()
+      .then((response) => {
+        if (active) setProfile(response?.profile || null);
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   // =====================================================
   // FORM STATE
   // =====================================================
@@ -178,10 +194,10 @@ const Contact = () => {
                   </p>
 
                   <a
-                    href="mailto:durgashrestha@example.com"
+                    href={`mailto:${profile?.email || "dbshrestha2051@gmail.com"}`}
                     className="break-all font-medium text-slate-900 hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
                   >
-                    dbshrestha2051@gmail.com
+                    {profile?.email || "dbshrestha2051@gmail.com"}
                   </a>
                 </div>
               </div>
@@ -198,7 +214,7 @@ const Contact = () => {
                   </p>
 
                   <p className="font-medium text-slate-900 dark:text-white">
-                    Bhaktpur, Nepal
+                    {profile?.location || "Bhaktapur, Nepal"}
                   </p>
                 </div>
               </div>

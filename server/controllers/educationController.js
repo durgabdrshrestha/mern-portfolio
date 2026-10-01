@@ -1,4 +1,5 @@
 import Education from "../models/Education.js";
+import { uploadedFileUrl } from "../middleware/uploadMiddleware.js";
 
 // =====================================================
 // GET ACTIVE EDUCATION
@@ -126,7 +127,7 @@ export const createEducation = async (req, res) => {
       isCurrent: isCurrentStudy,
       description,
       achievements,
-      institutionImage: req.file ? `/uploads/education/${req.file.filename}` : institutionImage,
+      institutionImage: req.file ? uploadedFileUrl(req.file, "education") : institutionImage,
       institutionWebsite,
       order,
       isActive,
@@ -161,7 +162,7 @@ export const updateEducation = async (req, res) => {
     // If education is current, remove end date
     const updateData = {
       ...req.body,
-      ...(req.file && { institutionImage: `/uploads/education/${req.file.filename}` }),
+      ...(req.file && { institutionImage: uploadedFileUrl(req.file, "education") }),
       ...(req.body.isCurrent !== undefined && {
         isCurrent: req.body.isCurrent === "true" || req.body.isCurrent === true,
       }),

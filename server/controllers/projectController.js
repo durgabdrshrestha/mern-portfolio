@@ -1,7 +1,6 @@
 import Project from "../models/Project.js";
-import fs from "fs";
-import path from "path";
 import { deleteUploadedFile } from "../utils/deleteFile.js";
+import { uploadedFileUrl } from "../middleware/uploadMiddleware.js";
 // =====================================================
 // GET ACTIVE PROJECTS
 // Public API
@@ -232,7 +231,7 @@ export const createProject = async (req, res) => {
     let image = "";
 
     if (req.files?.image?.length > 0) {
-      image = `/uploads/projects/${req.files.image[0].filename}`;
+      image = uploadedFileUrl(req.files.image[0], "projects");
     }
 
     // =====================================================
@@ -243,9 +242,7 @@ export const createProject = async (req, res) => {
 
     if (req.files?.images?.length > 0) {
       req.files.images.forEach((file) => {
-        galleryImages.push(
-          `/uploads/projects/${file.filename}`
-        );
+        galleryImages.push(uploadedFileUrl(file, "projects"));
       });
     }
     // =====================================================
@@ -348,26 +345,15 @@ export const updateProject = async (req, res) => {
 
     const mainImage = req.files?.image?.[0];
     if (mainImage) {
-      // Delete old image if it exists
-      if (project.image) {
-        const oldImagePath = path.join(
-          process.cwd(),
-          project.image.replace(/^\/+/, "")
-        );
+      await deleteUploadedFile(project.image);
 
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
-      }
-
-      // Save new image URL
-      req.body.image = `/uploads/projects/${mainImage.filename}`;
+      req.body.image = uploadedFileUrl(mainImage, "projects");
     }
 
     if (req.files?.images?.length) {
       req.body.images = [
         ...project.images,
-        ...req.files.images.map((file) => `/uploads/projects/${file.filename}`),
+        ...req.files.images.map((file) => uploadedFileUrl(file, "projects")),
       ];
     }
 
@@ -419,8 +405,10 @@ export const deleteProject = async (req, res) => {
       });
     }
 
-    deleteUploadedFile(project.image);
-    project.images.forEach(deleteUploadedFile);
+    await Promise.all([
+      deleteUploadedFile(project.image),
+      ...project.images.map((image) => deleteUploadedFile(image)),
+    ]);
 
     res.status(200).json({
       success: true,
@@ -489,7 +477,7 @@ export const deleteProjectGalleryImage = async (
     await project.save();
 
     // Delete physical file
-    deleteUploadedFile(imageUrl);
+    await deleteUploadedFile(imageUrl);
 
     res.status(200).json({
       success: true,
@@ -536,9 +524,7 @@ export const replaceProjectMainImage = async (
 
     if (!project) {
       // If project does not exist, remove the newly uploaded file
-      deleteUploadedFile(
-        `/uploads/projects/${req.file.filename}`
-      );
+      await deleteUploadedFile(uploadedFileUrl(req.file, "projects"));
 
       return res.status(404).json({
         success: false,
@@ -550,7 +536,7 @@ export const replaceProjectMainImage = async (
     const oldImage = project.image;
 
     // Create new image URL
-    const newImage = `/uploads/projects/${req.file.filename}`;
+    const newImage = uploadedFileUrl(req.file, "projects");
 
     // Update project
     project.image = newImage;
@@ -559,7 +545,7 @@ export const replaceProjectMainImage = async (
 
     // Delete old physical image
     if (oldImage) {
-      deleteUploadedFile(oldImage);
+      await deleteUploadedFile(oldImage);
     }
 
     res.status(200).json({
@@ -575,9 +561,7 @@ export const replaceProjectMainImage = async (
 
     // Remove newly uploaded file if database update fails
     if (req.file) {
-      deleteUploadedFile(
-        `/uploads/projects/${req.file.filename}`
-      );
+      await deleteUploadedFile(uploadedFileUrl(req.file, "projects"));
     }
 
     res.status(500).json({

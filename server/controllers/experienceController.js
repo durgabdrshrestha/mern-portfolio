@@ -1,4 +1,5 @@
 import Experience from "../models/Experience.js";
+import { uploadedFileUrl } from "../middleware/uploadMiddleware.js";
 
 // Get active experiences for public portfolio
 export const getExperiences = async (req, res) => {
@@ -99,7 +100,7 @@ export const createExperience = async (req, res) => {
       description,
       responsibilities,
       technologies,
-      companyImage: req.file ? `/uploads/experience/${req.file.filename}` : companyImage,
+      companyImage: req.file ? uploadedFileUrl(req.file, "experience") : companyImage,
       companyWebsite,
       order,
       isActive,
@@ -138,7 +139,7 @@ export const updateExperience = async (req, res) => {
     // Prevent current experience from having end date
     const updateData = {
       ...req.body,
-      ...(req.file && { companyImage: `/uploads/experience/${req.file.filename}` }),
+      ...(req.file && { companyImage: uploadedFileUrl(req.file, "experience") }),
       ...(req.body.isCurrent !== undefined && {
         isCurrent: req.body.isCurrent === "true" || req.body.isCurrent === true,
       }),

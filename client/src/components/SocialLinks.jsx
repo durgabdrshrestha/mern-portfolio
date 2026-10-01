@@ -12,7 +12,6 @@ import {
 
 import { useEffect, useState } from "react";
 
-import Loading from "./Loading";
 import { getSocialLinks } from "../services/socialLinkService";
 
 // Map database icon names to React Icons
@@ -39,7 +38,7 @@ const SocialLinks = () => {
 
         // Only use active social links
         const activeLinks = (response.socialLinks || [])
-          .filter((link) => link.isActive)
+          .filter((link) => link.isActive && !/(?:yourusername|example\.com|fcebook\.com)/i.test(link.url))
           .sort((a, b) => a.order - b.order);
 
         setSocialLinks(activeLinks);

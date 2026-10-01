@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Environment secrets (keep example files tracked)
+.env
+.env.*
+!.env.example
+
+# Build output and coverage
+dist/
+dist-ssr/
+build/
+coverage/
+
+# Runtime uploads are stored outside source control
+server/uploads/
+
+# Logs and debug output
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Local tool state
+*.local
+.vite/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editors and IDEs
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

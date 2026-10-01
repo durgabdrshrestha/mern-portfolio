@@ -25,7 +25,7 @@ const About = () => {
     loadProfile();
   }, []);
 
-  const profileImage = resolveAssetUrl(profile?.profileImage);
+  const profileImage = resolveAssetUrl(profile?.aboutImage || profile?.profileImage);
 
   return (
     <section className="min-h-screen bg-white px-4 py-20 dark:bg-slate-950">
