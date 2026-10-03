@@ -10,17 +10,54 @@ import { Link } from "react-router-dom";
 import { resolveAssetUrl } from "../services/api";
 import SectionTitle from "./SectionTitle";
 
-const AboutPreview = ({ profile }) => {
+const AboutPreview = ({ profile, experiences = [] }) => {
   if (!profile) {
     return null;
   }
 
-  const profileImage = profile.aboutImage || profile.profileImage || profile.image || "";
+  const profileImage =
+    profile.aboutImage || profile.profileImage || profile.image || "";
+
+  // Calculate experience from the earliest experience.startDate
+  const calculateExperience = () => {
+    const startDates = experiences
+      .map((experience) => experience.startDate)
+      .filter(Boolean)
+      .map((date) => new Date(date))
+      .filter((date) => !Number.isNaN(date.getTime()));
+
+    // If no experience data is available
+    if (startDates.length === 0) {
+      return profile.experience || "Experience";
+    }
+
+    // Find the earliest start date
+    const earliestStartDate = new Date(
+      Math.min(...startDates.map((date) => date.getTime()))
+    );
+
+    const today = new Date();
+
+    let years =
+      today.getFullYear() - earliestStartDate.getFullYear();
+
+    // Anniversary has not happened yet this year
+    const anniversaryNotReached =
+      today.getMonth() < earliestStartDate.getMonth() ||
+      (today.getMonth() === earliestStartDate.getMonth() &&
+        today.getDate() < earliestStartDate.getDate());
+
+    if (anniversaryNotReached) {
+      years--;
+    }
+
+    return `${Math.max(0, years)}+ Years`;
+  };
 
   return (
     <section id="about" className="bg-slate-50 py-20 dark:bg-slate-900/40">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Title */}
+
         <SectionTitle
           eyebrow="About Me"
           title="A little about my journey"
@@ -28,6 +65,7 @@ const AboutPreview = ({ profile }) => {
         />
 
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+
           {/* Profile Image */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
@@ -37,10 +75,8 @@ const AboutPreview = ({ profile }) => {
             className="flex w-full justify-center lg:justify-start"
           >
             <div className="relative">
-              {/* Decorative background */}
               <div className="absolute -inset-4 rounded-3xl bg-blue-600/10 blur-2xl dark:bg-blue-500/10" />
 
-              {/* Image Card */}
               <div className="relative w-full max-w-xl overflow-hidden rounded-3xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-800 dark:bg-slate-900">
                 {profileImage ? (
                   <img
@@ -82,6 +118,7 @@ const AboutPreview = ({ profile }) => {
 
             {/* Information Cards */}
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
+
               {/* Location */}
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900">
                 <FaMapMarkerAlt className="text-xl text-blue-600 dark:text-blue-400" />
@@ -104,7 +141,7 @@ const AboutPreview = ({ profile }) => {
                 </p>
 
                 <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
-                  {profile.experience || "5+ Years"}
+                  {calculateExperience()}
                 </p>
               </div>
 
@@ -120,6 +157,7 @@ const AboutPreview = ({ profile }) => {
                   Available
                 </p>
               </div>
+
             </div>
 
             {/* CTA */}
@@ -140,6 +178,7 @@ const AboutPreview = ({ profile }) => {
                 Contact Me
               </Link>
             </div>
+
           </motion.div>
         </div>
       </div>

@@ -116,7 +116,7 @@ const Home = () => {
       <Hero profile={profile} resume={resume} />
 
       {/* About Preview */}
-      <AboutPreview profile={profile} />
+      <AboutPreview profile={profile} experiences={experiences} />
 
       {/* Featured Skills */}
       <SkillsPreview skills={skills} />
