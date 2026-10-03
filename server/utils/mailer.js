@@ -1,35 +1,49 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const escapeHtml = (value) => value.replace(/[&<>"']/g, (character) => ({
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#39;",
-}[character]));
+const escapeHtml = (value = "") =>
+  String(value).replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[character]));
 
 export const sendContactReply = async ({ to, subject, body }) => {
-  const required = ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS"];
-  const missing = required.filter((name) => !process.env[name]);
-  if (missing.length) {
-    const error = new Error(`Missing SMTP settings: ${missing.join(", ")}`);
-    error.code = "SMTP_NOT_CONFIGURED";
+  if (!process.env.RESEND_API_KEY) {
+    const error = new Error("RESEND_API_KEY is not configured.");
+    error.code = "EMAIL_NOT_CONFIGURED";
     throw error;
   }
 
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: process.env.SMTP_SECURE === "true",
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-  });
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
   const safeBody = escapeHtml(body).replace(/\r?\n/g, "<br>");
 
-  return transporter.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
-    to,
+  const { data, error } = await resend.emails.send({
+    from:
+      process.env.RESEND_FROM ||
+      "Portfolio <onboarding@resend.dev>",
+    to: [to],
     subject: subject.replace(/[\r\n]+/g, " "),
     text: body,
     html: `<p>${safeBody}</p>`,
   });
+
+  if (error) {
+    console.error("Resend email error:", error);
+
+    const emailError = new Error(
+      error.message || "Failed to send email."
+    );
+
+    emailError.code = "EMAIL_SEND_FAILED";
+    emailError.details = error;
+
+    throw emailError;
+  }
+
+  console.log("Email sent successfully:", data?.id);
+
+  return data;
 };
