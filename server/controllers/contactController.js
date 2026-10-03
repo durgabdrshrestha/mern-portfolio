@@ -304,13 +304,15 @@ export const replyToContactMessage = async (req, res) => {
 
     return res.json({ success: true, message: "Reply sent successfully.", contactMessage });
   } catch (error) {
-    console.error("Contact reply failed:", error.message);
-    const status = error.code === "SMTP_NOT_CONFIGURED" ? 503 : 502;
-    return res.status(status).json({
-      success: false,
-      message: error.code === "SMTP_NOT_CONFIGURED"
-        ? "SMTP is not configured. Add the SMTP settings to the server environment."
-        : "Email delivery failed. Check the SMTP settings and try again.",
-    });
-  }
+  console.error("========== CONTACT REPLY ERROR ==========");
+  console.error("Message:", error.message);
+  console.error("Code:", error.code);
+  console.error("Details:", error.details);
+  console.error("==========================================");
+
+  return res.status(502).json({
+    success: false,
+    message: error.message || "Email delivery failed.",
+  });
+}
 };
