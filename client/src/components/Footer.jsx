@@ -139,7 +139,7 @@ const Footer = () => {
 
               <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
                 <FaMapMarkerAlt className="text-blue-600 dark:text-blue-400" />
-                <span>Bhaktapur,Nepal</span>
+                <span>Bhaktapur, Nepal</span>
               </div>
 
               <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
